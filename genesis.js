@@ -139,6 +139,7 @@
     void els.receiptPaper.offsetWidth;
     els.receiptPaper.classList.add('printing');
 
+    window.printerSound.setSource('assets/receipt.mp3.mpeg');
     window.printerSound.unlock();
       window.printerSound.play();
 
