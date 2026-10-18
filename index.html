@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repo Genesis — Feature Showcase</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="showcase-header">
+    <div class="brand">
+      <div class="brand-mark">Z</div>
+      <div class="brand-text">
+        <span class="brand-name">Repo Genesis</span>
+        <span class="brand-tag">v5.0.7 · Feature Showcase</span>
+      </div>
+    </div>
+    <nav class="showcase-nav">
+      <a href="#features">Features</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#try">Try it</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="try" class="hero">
+      <span class="eyebrow">◆ ZeroCommit · Repository Creation Engine</span>
+      <h1>Create GitHub repositories<br><em>without leaving the studio.</em></h1>
+      <p class="lede">Account-aware, org-aware, name-validated, and staged-change-aware repository creation. Live-preview the URL, pick personal or organization scope, and carry your active staged buffers straight into the brand-new repo.</p>
+      <div class="hero-actions">
+        <button id="btnOpenModal" class="btn btn-chrome btn-lg">Open Create Repository</button>
+        <a href="#features" class="btn btn-dark-steel btn-lg">Explore features</a>
+      </div>
+      <div class="demo-config">
+        <span class="demo-config-label">Mode</span>
+        <label class="hw-toggle">
+          <input type="checkbox" id="toggleLiveMode">
+          <span class="toggle-slider"></span>
+          <span>Live GitHub API</span>
+        </label>
+        <input type="password" id="livePatInput" class="input-field-sm" placeholder="ghp_..." style="display:none;" autocomplete="off" spellcheck="false">
+        <span id="modeHint" class="mode-hint">Demo mode — simulated responses</span>
+      </div>
+    </section>
+
+    <section id="features" class="features">
+      <div class="section-head">
+        <h2>What this feature does</h2>
+        <p>Six capabilities shipped in a single modal.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-index">01 · ACCOUNT</div>
+          <h3>Multi-account selection</h3>
+          <p>Pick the exact token and identity that should own the repository. Demo accounts and live PAT sessions share one selector.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-index">02 · OWNER</div>
+          <h3>Personal or organization</h3>
+          <p>Target your personal handle or any organization your token can write to. Orgs are resolved live from <code>/user/orgs</code>.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-index">03 · PREVIEW</div>
+          <h3>Live URL preview</h3>
+          <p><code>github.com / owner / name</code> updates on every keystroke, so you always see the exact destination before you create.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-index">04 · VALIDATION</div>
+          <h3>Real-time name checks</h3>
+          <p>Blocks leading/trailing dots or hyphens, <code>.git</code> suffix, and non-alphanumeric characters before the network call even fires.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-index">05 · VISIBILITY</div>
+          <h3>Segmented private/public toggle</h3>
+          <p>Private by default, with a hardware-style segmented control that mirrors the exact ZeroCommit visual language.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-index">06 · CARRYOVER</div>
+          <h3>Staged change carryover</h3>
+          <p>Keep your staged buffers when you spin up a new repo. The first push lands directly into the new target instead of being purged.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="pipeline" class="pipeline">
+      <div class="section-head">
+        <h2>Three-step pipeline</h2>
+        <p>From click to live repo in one flow.</p>
+      </div>
+      <div class="pipeline-grid">
+        <article class="pipeline-step-card">
+          <div class="pipeline-step-num">1</div>
+          <h3>Authenticate</h3>
+          <p>Resolve the active PAT or OAuth account from the vault (or the live PAT field in this showcase) and probe <code>/user</code> + <code>/user/orgs</code>.</p>
+        </article>
+        <article class="pipeline-step-card">
+          <div class="pipeline-step-num">2</div>
+          <h3>Create</h3>
+          <p>POST <code>/user/repos</code> or <code>/orgs/{org}/repos</code> with <code>auto_init: true</code> so the default branch ref exists immediately (avoids Git 409 on the first push).</p>
+        </article>
+        <article class="pipeline-step-card">
+          <div class="pipeline-step-num">3</div>
+          <h3>Settle</h3>
+          <p>Save the repo pointer, bump the workspace generation fence, refresh global labels, and optionally carry staged buffers into the new workspace.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="history-section">
+      <div class="section-head">
+        <h2>Created repositories</h2>
+        <p>Persisted locally so the showcase keeps a visible trail.</p>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+  </main>
+
+  <footer class="showcase-footer">
+    <span>Repo Genesis showcase · Built on the ZeroCommit monochromatic design system</span>
+    <span class="sound-note">🔊 Audio cues wired via Web Audio API — no asset files required</span>
+  </footer>
+
+  <div id="toastContainer" class="toast-container"></div>
+  <script type="module" src="genesis.js"></script>
+</body>
+</html>
