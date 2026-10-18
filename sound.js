@@ -1,6 +1,18 @@
 (function () {
   let ctx = null;
   let muted = false;
+  let sourceUrl = null;
+  let audioEl = null;
+
+  function ensureAudioEl() {
+    if (!sourceUrl) return null;
+    if (!audioEl) {
+      audioEl = new Audio(sourceUrl);
+      audioEl.preload = 'auto';
+      audioEl.crossOrigin = 'anonymous';
+    }
+    return audioEl;
+  }
 
   function getCtx() {
     if (!ctx) {
@@ -20,6 +32,15 @@
 
   function play() {
     if (muted) return;
+    const ext = ensureAudioEl();
+    if (ext) {
+      try {
+        ext.currentTime = 0;
+        const p = ext.play();
+        if (p && p.catch) p.catch(() => { /* fallback to synth if blocked */ });
+        return;
+      } catch (e) { /* fallback below */ }
+    }
     try {
       const ac = getCtx();
       if (!ac) return;
@@ -71,8 +92,19 @@
     } catch (e) { /* noop */ }
   }
 
-  function setMuted(v) { muted = !!v; }
+  function setMuted(v) {
+    muted = !!v;
+    if (audioEl) audioEl.muted = muted;
+  }
   function isMuted() { return muted; }
 
-  window.printerSound = { play, setMuted, isMuted, unlock };
+  function setSource(url) {
+    sourceUrl = url || null;
+    if (audioEl) {
+      audioEl.pause();
+      audioEl = null;
+    }
+  }
+
+  window.printerSound = { play, setMuted, isMuted, unlock, setSource };
 })();

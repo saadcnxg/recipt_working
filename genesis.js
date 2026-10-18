@@ -140,7 +140,7 @@
     els.receiptPaper.classList.add('printing');
 
     window.printerSound.unlock();
-    window.printerSound.play();
+      window.printerSound.play();
 
     clearTimeout(openReceipt._t);
     openReceipt._t = setTimeout(() => {
