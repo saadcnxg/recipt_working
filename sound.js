@@ -2,7 +2,32 @@
   let ctx = null;
   let muted = false;
   let sourceUrl = null;
+  let buffer = null;
+  let loadPromise = null;
   let audioEl = null;
+
+  function getCtx() {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ctx = new AC();
+    }
+    return ctx;
+  }
+
+  function ensureBuffer() {
+    if (!sourceUrl) return Promise.resolve(null);
+    if (buffer) return Promise.resolve(buffer);
+    if (loadPromise) return loadPromise;
+    const ac = getCtx();
+    if (!ac) return Promise.resolve(null);
+    loadPromise = fetch(sourceUrl, { mode: 'cors' })
+      .then(r => r.arrayBuffer())
+      .then(ab => ac.decodeAudioData(ab))
+      .then(b => { buffer = b; return b; })
+      .catch(() => { loadPromise = null; return null; });
+    return loadPromise;
+  }
 
   function ensureAudioEl() {
     if (!sourceUrl) return null;
@@ -14,15 +39,6 @@
     return audioEl;
   }
 
-  function getCtx() {
-    if (!ctx) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return null;
-      ctx = new AC();
-    }
-    return ctx;
-  }
-
   function unlock() {
     try {
       const ac = getCtx();
@@ -30,66 +46,48 @@
     } catch (e) { /* noop */ }
   }
 
-  function play() {
-    if (muted) return;
+  function preload() {
+    ensureBuffer();
+    ensureAudioEl();
+  }
+
+  function play(opts) {
+    if (muted) return null;
+    const targetDuration = (opts && opts.duration) || 0;
+    const ac = getCtx();
+    if (ac && ac.state === 'suspended') ac.resume();
+
+    if (ac && buffer) {
+      const src = ac.createBufferSource();
+      src.buffer = buffer;
+      const when = ac.currentTime + 0.005;
+      const gain = ac.createGain();
+      gain.gain.setValueAtTime(0.0001, when);
+      gain.gain.linearRampToValueAtTime(1, when + 0.02);
+      let playDuration = buffer.duration;
+      if (targetDuration > 0 && buffer.duration > targetDuration) {
+        playDuration = targetDuration;
+        gain.gain.setValueAtTime(1, when + playDuration - 0.12);
+        gain.gain.linearRampToValueAtTime(0.0001, when + playDuration);
+        src.start(when);
+        src.stop(when + playDuration);
+      } else {
+        src.start(when);
+      }
+      src.connect(gain).connect(ac.destination);
+      return { when, duration: playDuration };
+    }
+
     const ext = ensureAudioEl();
     if (ext) {
       try {
         ext.currentTime = 0;
         const p = ext.play();
-        if (p && p.catch) p.catch(() => { /* fallback to synth if blocked */ });
-        return;
-      } catch (e) { /* fallback below */ }
+        if (p && p.catch) p.catch(() => {});
+        return { when: performance.now(), duration: ext.duration || targetDuration };
+      } catch (e) { /* noop */ }
     }
-    try {
-      const ac = getCtx();
-      if (!ac) return;
-      if (ac.state === 'suspended') ac.resume();
-      const now = ac.currentTime;
-      const DURATION = 2.2;
-
-      const master = ac.createGain();
-      master.gain.value = 0.07;
-      master.connect(ac.destination);
-
-      // Motor hum
-      const motor = ac.createOscillator();
-      const motorGain = ac.createGain();
-      motor.type = 'sawtooth';
-      motor.frequency.setValueAtTime(58, now);
-      motor.frequency.linearRampToValueAtTime(66, now + DURATION);
-      motorGain.gain.setValueAtTime(0.28, now);
-      motorGain.gain.linearRampToValueAtTime(0.12, now + DURATION);
-      motor.connect(motorGain).connect(master);
-      motor.start(now);
-      motor.stop(now + DURATION);
-
-      // Paper whirr filter
-      const filt = ac.createBiquadFilter();
-      filt.type = 'lowpass';
-      filt.frequency.setValueAtTime(1200, now);
-      filt.frequency.linearRampToValueAtTime(700, now + DURATION);
-      filt.connect(master);
-
-      // Pre-build noise buffer
-      const buf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.03), ac.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-
-      const TICK_COUNT = 44;
-      const STEP = DURATION / TICK_COUNT;
-      for (let i = 0; i < TICK_COUNT; i++) {
-        const t = now + 0.05 + i * STEP + Math.random() * 0.008;
-        const src = ac.createBufferSource();
-        src.buffer = buf;
-        const g = ac.createGain();
-        g.gain.setValueAtTime(0.45, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
-        src.connect(g).connect(filt);
-        src.start(t);
-        src.stop(t + 0.03);
-      }
-    } catch (e) { /* noop */ }
+    return null;
   }
 
   function setMuted(v) {
@@ -99,12 +97,16 @@
   function isMuted() { return muted; }
 
   function setSource(url) {
+    if (sourceUrl === url) return;
     sourceUrl = url || null;
+    buffer = null;
+    loadPromise = null;
     if (audioEl) {
       audioEl.pause();
       audioEl = null;
     }
+    if (sourceUrl) preload();
   }
 
-  window.printerSound = { play, setMuted, isMuted, unlock, setSource };
+  window.printerSound = { play, setMuted, isMuted, unlock, setSource, preload };
 })();

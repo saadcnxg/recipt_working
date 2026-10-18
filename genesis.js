@@ -140,14 +140,20 @@
     els.receiptPaper.classList.add('printing');
 
     window.printerSound.setSource('assets/receipt.mp3.mpeg');
-    window.printerSound.unlock();
-      window.printerSound.play();
+    printSoundPlayed = false;
+    setTimeout(() => {
+      if (!printSoundPlayed) {
+        printSoundPlayed = true;
+        window.printerSound.unlock();
+        window.printerSound.play({ duration: PRINT_DURATION_MS / 1000 });
+      }
+    }, 30);
 
     clearTimeout(openReceipt._t);
     openReceipt._t = setTimeout(() => {
       els.receiptStatus.classList.add('printed');
       els.statusText.textContent = '✓ PRINTED';
-    }, 2200);
+    }, PRINT_DURATION_MS);
   }
 
   function closeReceipt() {
