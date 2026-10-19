@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nature | Contact</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="logo" href="index.html">🌿 Nature</a>
+  <button class="nav-toggle" aria-label="Menu">☰</button>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="facts.html">Facts</a>
+    <a href="contact.html" class="active">Contact</a>
+  </nav>
+</header>
+<main>
+  <section class="page">
+    <h1>Contact Us</h1>
+    <p>Have a story, photo, or question? We would love to hear from you.</p>
+    <form id="contact-form">
+      <input type="text" name="name" placeholder="Your name" required>
+      <input type="email" name="email" placeholder="Your email" required>
+      <textarea name="message" rows="5" placeholder="Your message" required></textarea>
+      <button class="submit" type="submit">Send Message</button>
+      <p id="form-msg"></p>
+    </form>
+  </section>
+</main>
+<footer><p>© <span id="year"></span> Nature. All rights reserved.</p></footer>
+<script src="js/main.js"></script>
+</body>
+</html>

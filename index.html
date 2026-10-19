@@ -1,31 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Receipt Printing Demo Replica | GitHub-Ji</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nature | Home</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-  <div class="demo-controls">
-    <h2 style="margin:0;font-weight:700;font-size:16px;">ZeroCommit / Chrono-DAG POS Receipt Demo</h2>
-    <button type="button" class="btn-trigger" id="btnTriggerReceipt">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M12 2v14M12 2l-4 4M12 2l4 4"/><circle cx="12" cy="19" r="3"/>
-      </svg>
-      <span>Deploy &amp; Print Receipt</span>
-    </button>
-    <div class="demo-info">Sound: assets/receipt.mp3.mpeg (local)</div>
-  </div>
-
-  <script src="script.js"></script>
+<header class="nav">
+  <a class="logo" href="index.html">🌿 Nature</a>
+  <button class="nav-toggle" aria-label="Menu">☰</button>
+  <nav class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="about.html">About</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="facts.html">Facts</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+<main>
+  <section class="hero">
+    <h1>Explore the Wild</h1>
+    <p>Forests, mountains, oceans — nature is the greatest story ever told.</p>
+    <a class="btn" href="gallery.html">View Gallery</a>
+  </section>
+  <section class="cards">
+    <article class="card">
+      <h2>Forests</h2>
+      <p>Home to more than 80% of all land-based species on Earth.</p>
+    </article>
+    <article class="card">
+      <h2>Oceans</h2>
+      <p>Cover 71% of the planet and produce nearly half of our oxygen.</p>
+    </article>
+    <article class="card">
+      <h2>Mountains</h2>
+      <p>Supply fresh water to more than half of humanity.</p>
+    </article>
+  </section>
+</main>
+<footer><p>© <span id="year"></span> Nature. All rights reserved.</p></footer>
+<script src="js/main.js"></script>
 </body>
 </html>
