@@ -1,4 +1,5 @@
 const SOUND_AUDIO_URL = 'assets/receipt.mp3.mpeg';
+const DEFAULT_PRINT_DURATION = 1.75;
 
 let printerAudio = null;
 let isSoundMuted = false;
@@ -375,15 +376,46 @@ function renderBomReceiptModal(deployedData = {}) {
     }
 
     if (stage === 'printing') {
-      playPrinterSound();
       if (microLed) microLed.className = 'status-led icon-spin';
       if (microLabel) {
         microLabel.className = 'status-label';
         microLabel.textContent = 'PRINTING...';
       }
-      const onPrintEnd = () => setStage('complete');
-      paperContainer?.addEventListener('animationend', onPrintEnd, { once: true });
-      setTimeout(onPrintEnd, 1900);
+
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        setStage('complete');
+      };
+
+      if (!isSoundMuted) {
+        const audio = getPrinterAudio();
+        if (audio) {
+          try {
+            audio.currentTime = 0;
+            const playPromise = audio.play();
+            if (playPromise && typeof playPromise.then === 'function') {
+              playPromise.then(() => {
+                audio.addEventListener('ended', finish, { once: true });
+              }).catch(() => {
+                synthesizeMechanicalPrinterNoise();
+              });
+            } else {
+              audio.addEventListener('ended', finish, { once: true });
+            }
+          } catch (_) {
+            synthesizeMechanicalPrinterNoise();
+          }
+        } else {
+          synthesizeMechanicalPrinterNoise();
+        }
+      }
+
+      const durStr = printerRoot.style.getPropertyValue('--print-duration').trim() || `${DEFAULT_PRINT_DURATION}s`;
+      const durMs = parseFloat(durStr) * 1000 || DEFAULT_PRINT_DURATION * 1000;
+      paperContainer?.addEventListener('animationend', finish, { once: true });
+      setTimeout(finish, durMs + 400);
     } else if (stage === 'complete') {
       if (microLed) microLed.className = 'status-led complete';
       if (microLabel) {
@@ -395,6 +427,15 @@ function renderBomReceiptModal(deployedData = {}) {
         printerOutputChute.style.pointerEvents = 'auto';
       }
     }
+  }
+
+  try {
+    const audio = getPrinterAudio();
+    const detected = (audio && !audio.error && isFinite(audio.duration) && audio.duration > 0.3) ? audio.duration : null;
+    const printDuration = (!isSoundMuted && detected) ? detected : DEFAULT_PRINT_DURATION;
+    printerRoot.style.setProperty('--print-duration', `${printDuration}s`);
+  } catch (_) {
+    printerRoot.style.setProperty('--print-duration', `${DEFAULT_PRINT_DURATION}s`);
   }
 
   setStage('printing');

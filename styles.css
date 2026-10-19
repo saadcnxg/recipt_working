@@ -340,7 +340,7 @@ body {
 }
 
 .printer-root[data-stage="printing"] .printer-paper-container {
-  animation: print-stepped 1.75s linear forwards;
+  animation: print-stepped var(--print-duration, 1.75s) linear forwards;
   opacity: 1;
 }
 
