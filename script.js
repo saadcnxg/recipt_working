@@ -1,4 +1,4 @@
-const SOUND_AUDIO_URL = 'https://head-harlequin-5kndgzxe.edgeone.dev/';
+const SOUND_AUDIO_URL = 'assets/receipt.mp3.mpeg';
 
 let printerAudio = null;
 let isSoundMuted = false;
@@ -12,11 +12,17 @@ try {
   isSoundMuted = localStorage.getItem('ghji_printer_mute') === 'true';
 } catch (_) {}
 
+try {
+  const audio = getPrinterAudio();
+  if (audio) audio.load();
+} catch (_) {}
+
 function getPrinterAudio() {
   if (!printerAudio && typeof Audio !== 'undefined') {
     printerAudio = new Audio(SOUND_AUDIO_URL);
     printerAudio.preload = 'auto';
-    printerAudio.crossOrigin = 'anonymous';
+    printerAudio.playsInline = true;
+    printerAudio.volume = 0.6;
   }
   return printerAudio;
 }
